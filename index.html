@@ -69,7 +69,7 @@
             const polling = async () => {
               const gist = await getGist();
               const files = gist.data.files;
-              for (const [key, value] of Object.entries(files)) {
+              for (const [key, value] of Object.entries(files).slice(-200)) {
                 if (!entriesRef.current.some((entry) => entry.file === key)) {
                   setEntries((entries) => [
                     ...entries,
