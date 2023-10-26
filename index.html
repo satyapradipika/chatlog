@@ -42,7 +42,7 @@
             const SpeechRecognition =
               window.SpeechRecognition || window.webkitSpeechRecognition;
             const recognition = new SpeechRecognition();
-            recognition.continuous = true;
+            recognition.continuous = false;
             recognition.onresult = (event) => {
               const lastIndex = event.results.length - 1;
               const transcript = event.results.item(lastIndex)[0].transcript;
