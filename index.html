@@ -32,7 +32,7 @@
               const response = await axios.post(decryptEndpoint, payload);
               setOctokit(
                 new Octokit({
-                  auth: response.decrypted_message,
+                  auth: response.data.decrypted_message,
                 })
               );
             })();
@@ -65,7 +65,8 @@
 
           React.useEffect(() => {
             if (!octokit) return;
-            (async function polling() {
+            if (entriesRef.current.length > 0) return;
+            const polling = async () => {
               const gist = await getGist();
               const files = gist.data.files;
               for (const [key, value] of Object.entries(files)) {
@@ -76,8 +77,9 @@
                   ]);
                 }
               }
-              setInterval(polling, 7000);
-            })();
+            };
+            setInterval(polling, 7000);
+            polling();
           }, [octokit]);
 
           React.useEffect(() => {
