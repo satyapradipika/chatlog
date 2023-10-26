@@ -105,23 +105,43 @@
           }, [text]);
 
           const getGist = async () => {
-            return await octokit.request("GET /gists/{gist_id}", {
-              gist_id: gistId,
-              headers: {
-                "X-GitHub-Api-Version": "2022-11-28",
-              },
-            });
+            try {
+              return await octokit.request("GET /gists/{gist_id}", {
+                gist_id: gistId,
+                headers: {
+                  "X-GitHub-Api-Version": "2022-11-28",
+                },
+              });
+            } catch (error) {
+              const rateLimit = await octokit.request("GET /rate_limit", {
+                headers: {
+                  "X-GitHub-Api-Version": "2022-11-28",
+                },
+              });
+              console.log(rateLimit);
+              console.log(error);
+            }
           };
 
           const patchGist = async (files) => {
-            return await octokit.request("PATCH /gists/{gist_id}", {
-              gist_id: gistId,
-              description: "An updated gist description",
-              files: files,
-              headers: {
-                "X-GitHub-Api-Version": "2022-11-28",
-              },
-            });
+            try {
+              return await octokit.request("PATCH /gists/{gist_id}", {
+                gist_id: gistId,
+                description: "An updated gist description",
+                files: files,
+                headers: {
+                  "X-GitHub-Api-Version": "2022-11-28",
+                },
+              });
+            } catch (error) {
+              const rateLimit = await octokit.request("GET /rate_limit", {
+                headers: {
+                  "X-GitHub-Api-Version": "2022-11-28",
+                },
+              });
+              console.log(error);
+              console.log(rateLimit);
+            }
           };
 
           const removeFile = async (e) => {
