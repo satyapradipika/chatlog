@@ -3,6 +3,7 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="icon" type="image/x-icon" href="/favicon.ico" />
     <script src="https://cdn.tailwindcss.com"></script>
     <script type="module">
       import React from "https://cdn.skypack.dev/react";
@@ -50,7 +51,7 @@
               setText((text) => [...text, transcript]);
             };
             recognition.onaudioend = () => {
-              recognition.abort();
+              recognition.stop();
               setIsRecording(false);
               setTimeout(function () {
                 recognition.start();
@@ -188,9 +189,13 @@
                 ${entries.reverse().map(
                   (entry, key) => html`
                     <li key=${key}>
-                      <div className="grid grid-cols-12 p-6 border-2">
-                        <p className="col-span-10 px-6">${entry.content}</p>
-                        <div className="col-span-2">
+                      <div
+                        className="grid grid-cols-12 m-3 p-3 border-2 rounded-md bg-gray-50"
+                      >
+                        <p className="col-span-10 lg:col-span-11 px-6">
+                          ${entry.content}
+                        </p>
+                        <div className="col-span-2 lg:col-span-1">
                           <button
                             onClick=${removeRecord}
                             data-timestamp=${entry.timestamp}
@@ -199,9 +204,14 @@
                             Remove
                           </button>
                           <p>
-                            ${new Date(
-                              parseInt(entry.timestamp)
-                            ).toLocaleString()}
+                            ${new Date(parseInt(entry.timestamp))
+                              .toLocaleString()
+                              .split(" ")[0]}
+                          </p>
+                          <p>
+                            ${new Date(parseInt(entry.timestamp))
+                              .toLocaleString()
+                              .split(" ")[1]}
                           </p>
                         </div>
                       </div>
