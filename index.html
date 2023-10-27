@@ -79,7 +79,7 @@
                 ? setEntries(JSON.parse(currentDayFile[1].content))
                 : setEntries([]);
             };
-            setInterval(polling, 15000);
+            setInterval(polling, 20000);
             polling();
           }, [octokit]);
 
