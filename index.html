@@ -186,8 +186,10 @@
             </section>
           `;
         };
-        const container = document.getElementById("root");
-        ReactDOM.render(React.createElement(Index), container);
+        ReactDOM.render(
+          React.createElement(Index),
+          document.getElementById("root")
+        );
       })();
     </script>
   </head>
