@@ -181,42 +181,52 @@
 
           return html`
             <section class="container mx-auto">
-              <p class="text-right">
-                Recording: ${isRecording ? "true" : "false"}
+              <p class="flex justify-end mr-6 mt-3">
+                ${
+                  isRecording &&
+                  html`<div
+                    class="w-5 h-5 bg-red-500 rounded-full animate-pulse mr-2 mt-0.5"
+                  ></div>`
+                }
+                <div>
+                  Recording: ${isRecording ? "true" : "false"}
+                </div>
               </p>
               <ul>
-                ${entries.reverse().map(
-                  (entry, key) => html`
-                    <li key=${key}>
-                      <div
-                        className="grid grid-cols-12 m-3 p-3 border-2 rounded-md bg-gray-50"
-                      >
-                        <p className="col-span-10 lg:col-span-11 px-6">
-                          ${entry.content}
-                        </p>
-                        <div className="col-span-2 lg:col-span-1">
-                          <button
-                            onClick=${removeRecord}
-                            data-timestamp=${entry.timestamp}
-                            className="p-3 bg-red-500 text-white"
-                          >
-                            Remove
-                          </button>
-                          <p>
-                            ${new Date(parseInt(entry.timestamp))
-                              .toLocaleString()
-                              .split(" ")[0]}
+                ${entries
+                  .sort((a, b) => parseInt(b.timestamp) - parseInt(a.timestamp))
+                  .map(
+                    (entry, key) => html`
+                      <li key=${key}>
+                        <div
+                          className="grid grid-cols-12 m-3 p-3 border-2 rounded-md bg-amber-100"
+                        >
+                          <p className="col-span-10 lg:col-span-11 px-6">
+                            ${entry.content}
                           </p>
-                          <p>
-                            ${new Date(parseInt(entry.timestamp))
-                              .toLocaleString()
-                              .split(" ")[1]}
-                          </p>
+                          <div className="col-span-2 lg:col-span-1">
+                            <button
+                              onClick=${removeRecord}
+                              data-timestamp=${entry.timestamp}
+                              className="p-3 bg-orange-600 text-white"
+                            >
+                              Remove
+                            </button>
+                            <p>
+                              ${new Date(parseInt(entry.timestamp))
+                                .toLocaleString()
+                                .split(" ")[0]}
+                            </p>
+                            <p>
+                              ${new Date(parseInt(entry.timestamp))
+                                .toLocaleString()
+                                .split(" ")[1]}
+                            </p>
+                          </div>
                         </div>
-                      </div>
-                    </li>
-                  `
-                )}
+                      </li>
+                    `
+                  )}
               </ul>
             </section>
           `;
