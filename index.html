@@ -50,8 +50,7 @@
               const transcript = event.results.item(lastIndex)[0].transcript;
               setText((text) => [...text, transcript]);
             };
-            recognition.onaudioend = () => {
-              recognition.stop();
+            recognition.onend = () => {
               setIsRecording(false);
               setTimeout(function () {
                 recognition.start();
@@ -61,7 +60,7 @@
             recognition.start();
             setIsRecording(true);
             return () => {
-              recognition.stop();
+              recognition.abort();
             };
           }, []);
 
