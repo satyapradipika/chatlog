@@ -14,7 +14,7 @@
         const Index = () => {
           const html = htm.bind(React.createElement);
           const [octokit, setOctokit] = React.useState(null);
-          const gistId = "d9835b9358da0e123f11b8bc462e168b";
+          const gistId = "446911667294bb878ffc9e500292ebf2";
           const [isRecording, setIsRecording] = React.useState(false);
           const [text, setText] = React.useState([]);
           const [entries, setEntries] = React.useState([]);
@@ -70,14 +70,11 @@
               const gist = await getGist();
               const files = gist.data.files;
               const entries = Object.entries(files);
-              for (const [key, value] of entries) {
-                if (!entriesRef.current.some((entry) => entry.file === key)) {
-                  setEntries((entries) => [
-                    ...entries,
-                    { file: key, content: value.content },
-                  ]);
-                }
-              }
+              const chatlog = entries[0][1];
+              const records = chatlog.content.length
+                ? JSON.parse(chatlog.content)
+                : [];
+              setEntries(records);
             };
             setInterval(polling, 15000);
             polling();
@@ -87,14 +84,15 @@
             (async () => {
               const message = text.pop();
               if (!message) return;
-              const payload = { file: `${Date.now()}.txt`, content: message };
-              setEntries((entries) => [...entries, payload]);
+              const payload = { timestamp: Date.now(), content: message };
+              const records = [...entries, payload];
               const files = {
-                [payload.file]: {
-                  content: payload.content,
+                chatlog: {
+                  content: `${JSON.stringify(records)}`,
                 },
               };
               await patchGist(files);
+              setEntries((entries) => [...entries, payload]);
             })();
           }, [text]);
 
@@ -107,8 +105,8 @@
                 },
               });
             } catch (error) {
-              await printRateLimit();
               console.log(error);
+              await printRateLimit();
             }
           };
 
@@ -123,28 +121,35 @@
                 },
               });
             } catch (error) {
-              await printRateLimit();
               console.log(error);
+              await printRateLimit();
             }
           };
 
           const printRateLimit = async () => {
-            const rateLimit = await octokit.request("GET /rate_limit", {
-              headers: {
-                "X-GitHub-Api-Version": "2022-11-28",
-              },
-            });
-            console.log(rateLimit);
+            try {
+              const rateLimit = await octokit.request("GET /rate_limit", {
+                headers: {
+                  "X-GitHub-Api-Version": "2022-11-28",
+                },
+              });
+              console.log(rateLimit);
+            } catch (error) {
+              console.log(error);
+            }
           };
 
           const removeFile = async (e) => {
-            const filename = e.target.getAttribute("data-file");
-            setEntries((entries) =>
-              entries.filter((entry) => entry.file !== filename)
+            const timestamp = e.target.getAttribute("data-timestamp");
+            const records = entries.filter(
+              (entry) => parseInt(entry.timestamp) !== parseInt(timestamp)
             );
             const files = {
-              [filename]: null,
+              chatlog: {
+                content: JSON.stringify(records),
+              },
             };
+            setEntries(records);
             await patchGist(files);
           };
 
@@ -154,35 +159,29 @@
                 Recording: ${isRecording ? "true" : "false"}
               </p>
               <ul>
-                ${entries
-                  .sort(
-                    (a, b) =>
-                      parseInt(b.file.split(".txt")[0]) -
-                      parseInt(a.file.split(".txt")[0])
-                  )
-                  .map(
-                    (entry, key) => html`
-                      <li key=${key}>
-                        <div className="grid grid-cols-12 p-6 border-2">
-                          <p className="col-span-10 px-6">${entry.content}</p>
-                          <div className="col-span-2">
-                            <button
-                              onClick=${removeFile}
-                              data-file=${entry.file}
-                              className="p-3 bg-red-500 text-white"
-                            >
-                              Remove
-                            </button>
-                            <p>
-                              ${new Date(
-                                parseInt(entry.file.split(".txt")[0])
-                              ).toLocaleString()}
-                            </p>
-                          </div>
+                ${entries.map(
+                  (entry, key) => html`
+                    <li key=${key}>
+                      <div className="grid grid-cols-12 p-6 border-2">
+                        <p className="col-span-10 px-6">${entry.content}</p>
+                        <div className="col-span-2">
+                          <button
+                            onClick=${removeFile}
+                            data-timestamp=${entry.timestamp}
+                            className="p-3 bg-red-500 text-white"
+                          >
+                            Remove
+                          </button>
+                          <p>
+                            ${new Date(
+                              parseInt(entry.timestamp)
+                            ).toLocaleString()}
+                          </p>
                         </div>
-                      </li>
-                    `
-                  )}
+                      </div>
+                    </li>
+                  `
+                )}
               </ul>
             </section>
           `;
