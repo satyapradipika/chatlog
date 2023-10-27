@@ -131,14 +131,15 @@
 
           const updateGist = async (files) => {
             try {
-              return await octokit.request("PATCH /gists/{gist_id}", {
+              const payload = {
                 gist_id: gistId,
                 description: "An updated gist description",
                 files: files,
                 headers: {
                   "X-GitHub-Api-Version": "2022-11-28",
                 },
-              });
+              };
+              return await octokit.request("PATCH /gists/{gist_id}", payload);
             } catch (error) {
               console.log(error);
               await printRateLimit();
