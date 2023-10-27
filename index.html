@@ -72,7 +72,7 @@
               const entries = Object.entries(files);
               const chatlog = entries[0][1];
               const records = chatlog.content.length
-                ? JSON.parse(chatlog.content)
+                ? JSON.parse(chatlog.content).slice(-200)
                 : [];
               setEntries(records);
             };
@@ -159,7 +159,7 @@
                 Recording: ${isRecording ? "true" : "false"}
               </p>
               <ul>
-                ${entries.map(
+                ${entries.reverse().map(
                   (entry, key) => html`
                     <li key=${key}>
                       <div className="grid grid-cols-12 p-6 border-2">
