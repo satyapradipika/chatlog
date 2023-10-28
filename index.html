@@ -48,7 +48,10 @@
               Array.from(event.results).forEach((result) => {
                 if (result.isFinal) {
                   const transcript = result[0].transcript;
-                  setText((text) => [...text, transcript]);
+                  if (transcript !== lastResult) {
+                    setText((text) => [...text, transcript]);
+                  }
+                  setLastResult(transcript);
                 }
               });
             };
